@@ -5,10 +5,16 @@ import com.seriendar.dao.TVShowEpisode;
 import java.util.List;
 
 /**
- * Created by Alexandre Lara on 20/07/2016.
+ * Manipula e gerencia um episódio
  */
 public class TvShowEpisodeUtil {
 
+    /**
+     * Método estático que obtem o número da última temporada da série.
+     *
+     * @param tvShowEpisodeList Lista contendo os episódios da série.
+     * @return Número da última temporada da série
+     */
     public static int getHighestSeason( List<TVShowEpisode> tvShowEpisodeList ){
         int maxSeason = 0;
 

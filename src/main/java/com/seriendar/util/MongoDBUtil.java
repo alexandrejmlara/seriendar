@@ -10,35 +10,61 @@ import com.seriendar.dao.TVShow;
 import com.seriendar.dao.TVShowEpisode;
 import com.seriendar.dao.TVShowEpisodesList;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
 /**
- * Created by Alexandre Lara on 18/07/2016.
+ * Gerencia as operações no banco de dados MongoDB.
+ *
+ * Instancia a conexão do cliente com o banco de dados, abre a conexão
+ * com o banco de dados MongoDB.
+ *
+ * Também atua na serialização e desserialização de objetos utilizando Gson.
+ *
  */
 public class MongoDBUtil {
+    /**
+     * Cliente do MongoDB que mantém a conexão com o servidor
+     */
     private MongoClient mongoClient = null;
+
+    /**
+     * Base de dados do MongoDB
+     */
     private MongoDatabase db = null;
+
+    /**
+     * Objeto Gson para serialização e desserialização de objetos Java
+     */
     private Gson gson = null;
 
-    public MongoDBUtil(){
+    /**
+     * Construtor que inicializa o banco de dados, a conexão do cliente
+     * e o objeto Gson.
+     *
+     */
+    public MongoDBUtil() {
         mongoClient = new MongoClient();
         db = mongoClient.getDatabase(Constants.DB_NAME);
         gson = new GsonBuilder().create();
 
     }
 
-    public TVShow getTVSHow( Integer id ){
+    /**
+     * Recupera uma série com o identificador único da mesma
+     *
+     * @param id Identificador único da série
+     * @return A série que contém o identificador passado como parâmetro
+     */
+    public TVShow getTVSHow(Integer id) {
         MongoCollection tvShowsCollections = db.getCollection(Constants.DB_COLLECTION_TVSHOWS);
         MongoCursor<Document> mCursorTvShows = tvShowsCollections.find(eq("_id", id)).iterator();
         TVShow tvShow = null;
 
-        if(mCursorTvShows.hasNext()){
+        if (mCursorTvShows.hasNext()) {
             Document docTvShow = mCursorTvShows.next();
             docTvShow.put("id", docTvShow.get("_id"));
             docTvShow.remove("_id");
@@ -48,13 +74,19 @@ public class MongoDBUtil {
         return tvShow;
     }
 
-    public List<TVShowEpisode> getTVShowEpisodesList( Integer id ){
+    /**
+     * Recupera uma lista de episódios de uma série em específico.
+     *
+     * @param id Identificador da série
+     * @return Lista de episódios de uma série
+     */
+    public List<TVShowEpisode> getTVShowEpisodesList(Integer id) {
 
         List<TVShowEpisode> tvShowEpisodeList = new ArrayList<TVShowEpisode>();
         MongoCollection episodesCollections = db.getCollection(Constants.DB_COLLECTION_EPISODES);
         MongoCursor<Document> mCursorEpisodes = episodesCollections.find(eq("tvShowId", id)).iterator();
 
-        while(mCursorEpisodes.hasNext()){
+        while (mCursorEpisodes.hasNext()) {
 
             Document docEpisode = mCursorEpisodes.next();
             docEpisode.put("id", docEpisode.get("_id"));
@@ -67,7 +99,13 @@ public class MongoDBUtil {
 
     }
 
-    public void saveTVShow( TVShow tvShow, TVShowEpisodesList tvShowEpisodesList ){
+    /**
+     * Salva a série no banco de dados MongoDB.
+     *
+     * @param tvShow Série a ser salva no banco de dados MongoDB
+     * @param tvShowEpisodesList Lista de episódios da série a ser salva no banco de dados MongoDB
+     */
+    public void saveTVShow(TVShow tvShow, TVShowEpisodesList tvShowEpisodesList) {
         MongoCollection tvShowsCollection = db.getCollection(Constants.DB_COLLECTION_TVSHOWS);
         Document docTVShow = Document.parse(gson.toJson(tvShow));
         docTVShow.remove("id");
@@ -77,17 +115,23 @@ public class MongoDBUtil {
         saveTVShowEpisodes(tvShow.getId(), tvShowEpisodesList);
     }
 
-    public List<TVShowEpisode> getEpisodesOfTheDay( String firstAired ){
+    /**
+     * Recupera a lista de episódios em um dia específico
+     *
+     * @param firstAired Data de referência
+     * @return Lista de episódios de um dia específico
+     */
+    public List<TVShowEpisode> getEpisodesOfTheDay(String firstAired) {
         MongoCollection episodesCollection = db.getCollection(Constants.DB_COLLECTION_EPISODES);
         MongoCursor<Document> mCursorEpisodes = episodesCollection.find(eq("firstAired", firstAired)).iterator();
         List<TVShowEpisode> listEpisodes = new ArrayList<TVShowEpisode>();
-        while(mCursorEpisodes.hasNext()){
+        while (mCursorEpisodes.hasNext()) {
             Document episode = mCursorEpisodes.next();
 
             MongoCollection tvShowsCollection = db.getCollection(Constants.DB_COLLECTION_TVSHOWS);
             MongoCursor<Document> mCursorTvShows = tvShowsCollection.find(eq("_id", episode.get("tvShowId"))).iterator();
 
-            if(mCursorTvShows.hasNext()){
+            if (mCursorTvShows.hasNext()) {
                 Document docTvShow = mCursorTvShows.next();
                 episode.put("seriesName", docTvShow.get("seriesName"));
             }
@@ -99,11 +143,17 @@ public class MongoDBUtil {
 
     }
 
-    private void saveTVShowEpisodes ( Integer tvShowId, TVShowEpisodesList tvShowEpisodesList ){
+    /**
+     * Salva os episódios da série no banco de dados MongoDB.
+     *
+     * @param tvShowId Identificador único da série
+     * @param tvShowEpisodesList Lista de episódios a serem salvos no banco de dados MongoDB
+     */
+    private void saveTVShowEpisodes(Integer tvShowId, TVShowEpisodesList tvShowEpisodesList) {
         MongoCollection tvShowsCollection = db.getCollection(Constants.DB_COLLECTION_TVSHOWS);
         MongoCollection episodesCollection = db.getCollection(Constants.DB_COLLECTION_EPISODES);
 
-        for( TVShowEpisode episode : tvShowEpisodesList.getData() ){
+        for (TVShowEpisode episode : tvShowEpisodesList.getData()) {
 
             Document docEpisode = Document.parse(gson.toJson(episode));
             docEpisode.append("tvShowId", tvShowId);

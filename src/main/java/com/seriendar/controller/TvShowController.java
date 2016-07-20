@@ -16,9 +16,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ *  Controla as requisições realizada em cada url pertencente a uma série
+ *  em específico.
+ *   *
+ */
 @Controller
 public class TvShowController {
 
+    /**
+     *  Obtém a série do banco de dados e seus respectivos episódios. Ordena os
+     *  episodios pela ordem de lançamento.
+     *
+     * @param tvShowId Id da série
+     * @param model Permite a passagem de parâmetros entre a classe controller e a view.
+     * @return O nome da view responsável por mostrar o resultado da requisição
+     */
     @GetMapping("/tvshow/{tvShowId}")
     public String tvshow(@PathVariable String tvShowId, Model model){
 

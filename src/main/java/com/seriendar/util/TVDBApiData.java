@@ -22,16 +22,36 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Alexandre Lara on 18/07/2016.
+ * Responsável pela comunicação do sistema com a API da TVDB.
+ *
+ * Obtém o token e realiza requisições a fim de obter os recursos
+ * necessários para o funcionamento do sistema.
+ *
  */
 public class TVDBApiData {
+    /**
+     * Token utilizado para comunicação com a API
+     */
     private String token = null;
+
+    /**
+     * Objeto Gson para serialização e desserialização de objetos Java
+     */
     private Gson gson;
 
+    /**
+     * Construtor que inicializa o objeto Gson.
+     */
     public TVDBApiData(){
         gson = new GsonBuilder().create();
     }
 
+    /**
+     * Obtém e recupera o token utilizado na comunicação com a API
+     *
+     * @return Token utilizado na comunicação com a API
+     * @throws IOException
+     */
     public String getToken() throws IOException {
         Document docApiKey = new Document();
         docApiKey.put("apikey", Constants.API_KEY);
@@ -66,6 +86,12 @@ public class TVDBApiData {
 
     }
 
+    /**
+     * Recupera uma série com o id especificado.
+     *
+     * @param id Identificador único da série
+     * @return Série com o id especificado
+     */
     public TVShow getTVShow( Long id ) {
         //Document docEpisodeRequest = new Document();
         TVShow tvShow = null;
@@ -105,6 +131,14 @@ public class TVDBApiData {
 
     }
 
+    /**
+     * Recupera uma lista de episódios da série com o identificador único especificado
+     * via parâmetro.
+     *
+     * @param id Identificador único da série
+     * @return Lista de episódios da série
+     * @throws IOException
+     */
     public TVShowEpisodesList getTVShowEpisodesList(Long id ) throws IOException {
         TVShowEpisodesList tvShowEpisodesList = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();

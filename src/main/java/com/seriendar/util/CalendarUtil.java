@@ -6,10 +6,21 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Alexandre Lara on 19/07/2016.
+ * Controla ações relacionadas ao calendário de séries.
+ *
+ * Obtem a lista de dias da semana baseando-se no dia que é
+ * passado como parâmetro em seu método.
+ *
  */
 public class CalendarUtil {
 
+    /**
+     * Recupera um lista de objetos {@link DayOfWeek} contendo os dias da semana, iniciando-se no Domingo.
+     *
+     * @param refDate Dia de referência
+     * @param firstDayOfWeek Primeiro dia da semana a ser considerado
+     * @return Lista contendo os dias da semana da data de referência
+     */
     public static List<DayOfWeek> getDaysOfWeekArray(Date refDate, int firstDayOfWeek){
         Date[] days = getDaysOfWeek(refDate, firstDayOfWeek);
         List<DayOfWeek> daysOfWeekList = new ArrayList<DayOfWeek>();
@@ -27,6 +38,13 @@ public class CalendarUtil {
         return daysOfWeekList;
     }
 
+    /**
+     * Utilizado internamente para obter um array de dias da semana
+     *
+     * @param refDate Dia de referência
+     * @param firstDayOfWeek Primeiro dia da semana a ser considerado
+     * @return Array contendo os dias da semana da data de referência
+     */
     private static Date[] getDaysOfWeek(Date refDate, int firstDayOfWeek) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(refDate);
